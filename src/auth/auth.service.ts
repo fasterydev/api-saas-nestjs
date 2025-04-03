@@ -17,7 +17,6 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ApiKey } from './entities/apikey.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { IncomingHttpHeaders } from 'http';
 import {
   CreateUserParams,
   UpdateUserParams,
