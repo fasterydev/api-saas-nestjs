@@ -17,7 +17,6 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ApiKey } from './entities/apikey.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { IncomingHttpHeaders } from 'http';
 import {
   CreateUserParams,
   UpdateUserParams,
@@ -199,10 +198,11 @@ export class AuthService {
   }
   // CERRAR SESIÓN
   // REFRESCAR TOKEN
-  async checkAuthStatus(user: User) {
+  checkAuthStatus(user: User) {
+    const token = this.getJwtToken({ id: user.id });
     return {
       ...user,
-      accessToken: this.getJwtToken({ id: user.id }),
+      accessToken: token,
     };
   }
   // SERVER++

@@ -42,9 +42,10 @@ import { ApiKeyStrategy } from './strategies/apikey.strategy';
   exports: [
     TypeOrmModule,
     JwtStrategy,
-    // ApiKeyStrategy,
-    PassportModule,
     JwtModule,
+    PassportModule,
+    ApiKeyStrategy,
+    ClerkClientProvider,
   ],
 })
 export class AuthModule {}
