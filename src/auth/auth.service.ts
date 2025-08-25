@@ -198,10 +198,11 @@ export class AuthService {
   }
   // CERRAR SESIÓN
   // REFRESCAR TOKEN
-  async checkAuthStatus(user: User) {
+  checkAuthStatus(user: User) {
+    const token = this.getJwtToken({ id: user.id });
     return {
       ...user,
-      accessToken: this.getJwtToken({ id: user.id }),
+      accessToken: token,
     };
   }
   // SERVER++
