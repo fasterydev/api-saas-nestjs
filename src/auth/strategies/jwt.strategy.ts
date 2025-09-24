@@ -38,9 +38,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
       return user;
     } catch (error) {
-      throw new UnauthorizedException(
-        error.message || 'Error en la autenticación JWT',
-      );
+      throw new UnauthorizedException(error ? error : 'Token no es valido');
     }
   }
 }

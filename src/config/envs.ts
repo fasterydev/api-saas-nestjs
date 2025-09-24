@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+ 
 import 'dotenv/config';
 import * as joi from 'joi';
 

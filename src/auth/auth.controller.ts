@@ -11,7 +11,7 @@ export class AuthController {
 
   // **** CLERK ****
   @Get('clerkGetUsers')
-  // @Auth(ValidRoles.admin)
+  @Auth(ValidRoles.admin)
   clerkGetUsers() {
     return this.authService.clerkGetUsers({
       limit: 10,
