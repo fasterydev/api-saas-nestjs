@@ -5,16 +5,10 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from './dto/login-user.dto';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { JwtService } from '@nestjs/jwt';
 import { ApiKey } from './entities/apikey.entity';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -34,8 +28,6 @@ export class AuthService {
     @InjectRepository(ApiKey)
     private readonly apikeyRepository: Repository<ApiKey>,
 
-    private readonly jwtService: JwtService,
-
     @Inject('ClerkClient')
     private readonly clerkClient: ClerkClient,
   ) {}
@@ -48,7 +40,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Error in clerkGetUsers ${JSON.stringify(params)}`);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al obtener los usuarios.',
+        error || 'Ocurrió un error al obtener los usuarios.',
       );
     }
   }
@@ -58,7 +50,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Error in clerkGetUser ${id}`);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al obtener el usuario.',
+        error || 'Ocurrió un error al obtener el usuario.',
       );
     }
   }
@@ -69,11 +61,10 @@ export class AuthService {
     } catch (error) {
       this.logger.error(
         `Error in clerkCreateUser ${JSON.stringify(params)}`,
-        error.stack,
-        error.response?.data,
+        error,
       );
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al crear el usuario.',
+        error || 'Ocurrió un error al crear el usuario.',
       );
     }
   }
@@ -83,11 +74,10 @@ export class AuthService {
     } catch (error) {
       this.logger.error(
         `Error in clerkUpdateUser ${id} ${JSON.stringify(params)}`,
-        error.stack,
-        error.response?.data,
+        error,
       );
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al actualizar el usuario.',
+        error || 'Ocurrió un error al actualizar el usuario.',
       );
     }
   }
@@ -97,88 +87,22 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Error in clerkDeleteUser ${id}`);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al eliminar el usuario.',
+        error || 'Ocurrió un error al eliminar el usuario.',
       );
     }
   }
-
-  // **** JWT ****
-  async register(createUserDto: CreateUserDto) {
-    // FIXME: CREAR CONECTAR CON CLERK
-    try {
-      const { password, ...userData } = createUserDto;
-      const user = this.userRepository.create({
-        ...userData,
-        password: await bcrypt.hashSync(password, 10),
-      });
-      await this.userRepository.save(user);
-      user.password = '**********';
-      return {
-        message: 'Usuario registrado con éxito.',
-      };
-    } catch (error) {
-      this.logger.error(`Error in register ${createUserDto.userName}`);
-      if (error instanceof BadRequestException) {
-        error.message || 'Ocurrió un error al registrar el usuario.';
-      } else {
-        throw new InternalServerErrorException(
-          error.message || 'Ocurrió un error al registrar el usuario.',
-        );
-      }
-    }
-  }
+  // **** DATABASE ****
   async getUsers() {
     try {
       const users = await this.userRepository.find();
       return users;
     } catch (error) {
-      this.logger.error(`Error in getUsers`, error.response?.data);
-      if (error instanceof BadRequestException) {
-        error.message || 'Ocurrió un error al registrar el usuario.';
-      } else {
-        throw new InternalServerErrorException(
-          error.message || 'Ocurrió un error al registrar el usuario.',
-        );
-      }
+      this.logger.error(`Error in getUsers`, error);
+      throw new InternalServerErrorException(
+        error || 'Ocurrió un error al obtener los usuarios.',
+      );
     }
   }
-  // USER++
-  async login(loginUserDto: LoginUserDto) {
-    try {
-      const { password, email } = loginUserDto;
-      const user = await this.userRepository.findOne({
-        where: { email, isActive: true },
-        select: {
-          email: true,
-          password: true,
-          id: true,
-          userName: true,
-          roles: true,
-        },
-      });
-
-      if (!user)
-        throw new UnauthorizedException('Credenciales inválidas (email)');
-
-      if (!bcrypt.compareSync(password, user.password))
-        throw new UnauthorizedException('Credeciales inválidas (password)');
-      // delete user.password;
-      return {
-        ...user,
-        accessToken: this.getJwtToken({ id: user.id }),
-      };
-    } catch (error) {
-      this.logger.error(`Error in login ${loginUserDto.email}`, error);
-      if (error instanceof BadRequestException) {
-        error.message || 'Ocurrió un error al registrar el usuario.';
-      } else {
-        throw new InternalServerErrorException(
-          error.message || 'Ocurrió un error al registrar el usuario.',
-        );
-      }
-    }
-  }
-  // USER++
   async getUserData(user: User) {
     try {
       const userData = await this.userRepository.findOne({
@@ -187,35 +111,16 @@ export class AuthService {
       return userData;
     } catch (error) {
       this.logger.error(`Error in getUserData UserId: ${user.id}`);
-      if (error instanceof BadRequestException) {
-        error.message || 'Ocurrió un error al registrar el usuario.';
-      } else {
-        throw new InternalServerErrorException(
-          error.message || 'Ocurrió un error al registrar el usuario.',
-        );
-      }
+      throw new InternalServerErrorException(
+        error || 'Ocurrió un error al obtener los datos del usuario.',
+      );
     }
   }
-  // CERRAR SESIÓN
-  // REFRESCAR TOKEN
-  checkAuthStatus(user: User) {
-    const token = this.getJwtToken({ id: user.id });
-    return {
-      ...user,
-      accessToken: token,
-    };
-  }
-  // SERVER++
-  private getJwtToken(payload: JwtPayload) {
-    const token = this.jwtService.sign(payload);
-    return token;
-  }
-
   // **** API KEY ****
   async createApiKey(user: User) {
     try {
       const key = uuidv4();
-      const apiKey = await this.apikeyRepository.create({
+      const apiKey = this.apikeyRepository.create({
         key: key,
         user: user,
       });
@@ -225,7 +130,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Error in createApiKey ${user.id}`, error);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al crear la ApiKey.',
+        error || 'Ocurrió un error al crear la ApiKey.',
       );
     }
   }
@@ -238,7 +143,7 @@ export class AuthService {
     } catch (error) {
       this.logger.error(`Error in getApiKeys ${user.id}`, error);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al obtener las ApiKeys.',
+        error || 'Ocurrió un error al obtener las ApiKeys.',
       );
     }
   }
@@ -273,9 +178,9 @@ export class AuthService {
         message: `ApiKey eliminada con éxito con el Id ${id}`,
       };
     } catch (error) {
-      this.logger.error(`Error en deleteApiKey con id: ${id}`, error.stack);
+      this.logger.error(`Error en deleteApiKey con id: ${id}`, error);
       throw new InternalServerErrorException(
-        error.message || 'Ocurrió un error al eliminar la ApiKey.',
+        error || 'Ocurrió un error al eliminar la ApiKey.',
       );
     }
   }

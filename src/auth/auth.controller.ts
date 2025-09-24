@@ -1,17 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  Headers,
-  Delete,
-  Param,
-  Patch,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { Auth } from './decorators/auth.decorator';
@@ -23,12 +11,11 @@ export class AuthController {
 
   // **** CLERK ****
   @Get('clerkGetUsers')
-  @Auth(ValidRoles.admin)
+  // @Auth(ValidRoles.admin)
   clerkGetUsers() {
     return this.authService.clerkGetUsers({
       limit: 10,
       offset: 0,
-      // FIXME: Add filters
     });
   }
 
@@ -39,9 +26,8 @@ export class AuthController {
   }
 
   @Post('clerkCreateUser')
-  @Auth(ValidRoles.admin)
+  // @Auth(ValidRoles.admin)
   clerkCreateUser() {
-    // FIXME: CREAR UN DTO SOLO PARA CLERK
     return this.authService.clerkCreateUser({
       emailAddress: ['cj22228@gmail.com'],
       firstName: 'Cristian',
@@ -69,18 +55,6 @@ export class AuthController {
     return this.authService.clerkDeleteUser(id);
   }
 
-  // **** JWT ****
-
-  @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
-  }
-
-  @Get('login')
-  login(@Query() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
-  }
-
   // @Get('test')
   // @Auth(ValidRoles.user)
   // test() {
@@ -93,12 +67,6 @@ export class AuthController {
   // @Auth()
   getUserData(@GetUser() user: User) {
     return this.authService.getUserData(user);
-  }
-
-  @Get('checkAuthStatus')
-  @Auth(ValidRoles.user)
-  checkAuthStatus(@GetUser() user: User) {
-    return this.authService.checkAuthStatus(user);
   }
 
   @Get('getUsers')

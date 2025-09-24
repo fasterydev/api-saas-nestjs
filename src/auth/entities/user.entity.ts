@@ -3,6 +3,7 @@ import {
   BeforeUpdate,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -27,13 +28,6 @@ export class User {
   @Column('text', { nullable: true })
   lastName: string;
 
-  @Column('text', {
-    select: false,
-    nullable: true,
-    default: null,
-  })
-  password: string;
-
   @Column('bool', { default: true })
   isActive: boolean;
 
@@ -43,13 +37,16 @@ export class User {
   @OneToMany(() => ApiKey, (apiKey) => apiKey.user, { onDelete: 'CASCADE' })
   apiKeys: ApiKey[];
 
-  @CreateDateColumn({})
+  @CreateDateColumn()
   createAt: Date;
 
-  @UpdateDateColumn({})
+  @UpdateDateColumn()
   updateAt: Date;
 
-  @Column({ nullable: true })
+  @DeleteDateColumn()
+  deleteAt: Date;
+
+  @Column()
   clerkId: string;
 
   @BeforeInsert()
