@@ -6,7 +6,8 @@
   "author": "fasterydev <info@fastery.dev>",
   "license": "Proprietary",
   "engines": {
-    "node": "22.x"
+    "node": "24.x",
+    "npm": ">=11.0.0"
   },
   "scripts": {
     "build": "nest build",
@@ -23,30 +24,30 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@clerk/backend": "^2.15.0",
+    "@clerk/backend": "^2.29.2",
     "@nestjs/cache-manager": "^3.0.1",
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
-    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.1.0",
+    "@nestjs/platform-express": "^11.1.11",
+    "@nestjs/swagger": "^11.2.4",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.1",
-    "joi": "^18.0.1",
+    "class-validator": "^0.14.3",
+    "joi": "^18.0.2",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-headerapikey": "^1.2.2",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "pg": "^8.14.1",
+    "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "typeorm": "^0.3.21"
+    "rxjs": "^7.8.2",
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
