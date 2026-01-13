@@ -1,10 +1,25 @@
 {
-  "name": "nestjs-project-template",
+  "name": "api-saas-nestjs",
   "version": "1.0.0",
   "private": true,
-  "description": "A custom project for fast and efficient solutions.",
-  "author": "fasterydev <info@fastery.dev>",
-  "license": "Proprietary",
+  "description": "API SaaS backend construida con NestJS, incluyendo autenticación multi-estrategia (JWT, Clerk, API Keys), gestión de usuarios, productos y arquitectura escalable para aplicaciones SaaS modernas.",
+  "keywords": [
+    "nestjs",
+    "saas",
+    "api",
+    "backend",
+    "typescript",
+    "authentication",
+    "jwt",
+    "clerk",
+    "typeorm",
+    "postgresql",
+    "swagger",
+    "rest-api"
+  ],
+  "author": "FasteryDev LLC <info@fastery.dev>",
+  "license": "UNLICENSED",
+  "copyright": "Copyright (c) 2024 FasteryDev LLC. Todos los derechos reservados.",
   "engines": {
     "node": "24.x",
     "npm": ">=11.0.0"
